@@ -4,10 +4,10 @@
       return /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/script-loader.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/module-loader.js!./node_modules/babel-loader/lib/index.js?cwd=/Users/zacharypowell/.quickapp-ide/workspace/com.vonage.quickapp.test&cacheDirectory&plugins[]=/Users/zacharypowell/.quickapp-ide/workspace/com.vonage.quickapp.test/node_modules/@hap-toolkit/dsl-xvm/lib/loaders/babel-plugin-jsx.js&comments=false&configFile=/Users/zacharypowell/.quickapp-ide/workspace/com.vonage.quickapp.test/node_modules/@hap-toolkit/packager/babel.config.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/access-loader.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/fragment-loader.js?index=0&type=script!./src/Hello/hello.ux?uxType=page":
-/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/script-loader.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/module-loader.js!./node_modules/babel-loader/lib/index.js?cwd=/Users/zacharypowell/.quickapp-ide/workspace/com.vonage.quickapp.test&cacheDirectory&plugins[]=/Users/zacharypowell/.quickapp-ide/workspace/com.vonage.quickapp.test/node_modules/@hap-toolkit/dsl-xvm/lib/loaders/babel-plugin-jsx.js&comments=false&configFile=/Users/zacharypowell/.quickapp-ide/workspace/com.vonage.quickapp.test/node_modules/@hap-toolkit/packager/babel.config.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/access-loader.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/fragment-loader.js?index=0&type=script!./src/Hello/hello.ux?uxType=page ***!
-  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/script-loader.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/module-loader.js!./node_modules/babel-loader/lib/index.js?cwd=/Users/zacharypowell/Documents/Code/sample/quickapp-helloworld&cacheDirectory&plugins[]=/Users/zacharypowell/Documents/Code/sample/quickapp-helloworld/node_modules/@hap-toolkit/dsl-xvm/lib/loaders/babel-plugin-jsx.js&comments=false&configFile=/Users/zacharypowell/Documents/Code/sample/quickapp-helloworld/babel.config.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/access-loader.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/fragment-loader.js?index=0&type=script!./src/Hello/hello.ux?uxType=page":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/script-loader.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/module-loader.js!./node_modules/babel-loader/lib/index.js?cwd=/Users/zacharypowell/Documents/Code/sample/quickapp-helloworld&cacheDirectory&plugins[]=/Users/zacharypowell/Documents/Code/sample/quickapp-helloworld/node_modules/@hap-toolkit/dsl-xvm/lib/loaders/babel-plugin-jsx.js&comments=false&configFile=/Users/zacharypowell/Documents/Code/sample/quickapp-helloworld/babel.config.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/access-loader.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/fragment-loader.js?index=0&type=script!./src/Hello/hello.ux?uxType=page ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 module.exports = function __scriptModule__ (module, exports, $app_require$){"use strict";
@@ -19,41 +19,9 @@ var _nexmoClient = _interopRequireDefault(__webpack_require__(/*! nexmo-client *
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const vonageJWT = '';
-const callButton = (void 0).$element("call");
-const hangupButton = (void 0).$element("hangup");
-const statusElement = (void 0).$element("status");
-new _nexmoClient.default({
-  debug: true
-}).createSession(vonageJWT).then(app => {
-  callButton.addEventListener("click", event => {
-    event.preventDefault();
-    let destination = (void 0).$element("phone-number").value;
-
-    if (destination !== "") {
-      app.callServer(destination);
-    } else {
-      statusElement.innerText = 'Please enter your phone number.';
-    }
-  });
-  app.on("member:call", (member, call) => {
-    hangupButton.addEventListener("click", () => {
-      call.hangUp();
-    });
-  });
-  app.on("call:status:changed", call => {
-    statusElement.innerText = `Call status: ${call.status}`;
-
-    if (call.status === call.CALL_STATUS.STARTED) {
-      callButton.style.display = "none";
-      hangupButton.style.display = "inline";
-    }
-
-    if (call.status === call.CALL_STATUS.COMPLETED) {
-      callButton.style.display = "inline";
-      hangupButton.style.display = "none";
-    }
-  });
-}).catch(console.error);
+let client;
+let sessionApplication;
+let currentCall;
 module.exports = {
   data: {
     componentData: {}
@@ -61,7 +29,7 @@ module.exports = {
 
   onInit() {
     this.$page.setTitleBar({
-      text: 'menu',
+      text: 'Vonage Voice Call',
       textColor: '#ffffff',
       backgroundColor: '#007DFF',
       backgroundOpacity: 0.5,
@@ -69,21 +37,14 @@ module.exports = {
     });
 
     if (vonageJWT !== "") {
-      new _nexmoClient.default({
+      client = new _nexmoClient.default({
         debug: true
       }).createSession(vonageJWT).then(app => {
-        let destination = "07528640068";
-
-        if (destination !== "") {
-          app.callServer(destination);
-        } else {
-          _system.default.showToast({
-            message: 'Please enter your phone number.',
-            duration: 2000,
-            gravity: 'center'
-          });
-        }
-      }).catch(console.error);
+        sessionApplication = app;
+        sessionApplication.on("member:call", (member, call) => {
+          currentCall = call;
+        });
+      });
     } else {
       _system.default.showToast({
         message: 'Error: Vonage JWT not set',
@@ -91,6 +52,16 @@ module.exports = {
         gravity: 'center'
       });
     }
+  },
+
+  makeCall() {
+    console.info('Implement the call method here');
+    sessionApplication.callServer("NUMBER_TO_CALL");
+  },
+
+  endCall() {
+    console.info('Implement the end call method here');
+    currentCall.hangUp();
   }
 
 };
@@ -194,17 +165,6 @@ module.exports = {
     {
       "type": "input",
       "attr": {
-        "placeholder": "i.e. 14155550100",
-        "id": "phone-number"
-      },
-      "classList": [
-        "phone"
-      ],
-      "id": "phone-number"
-    },
-    {
-      "type": "input",
-      "attr": {
         "type": "button",
         "value": "Call",
         "id": "call"
@@ -212,7 +172,10 @@ module.exports = {
       "classList": [
         "btn"
       ],
-      "id": "call"
+      "id": "call",
+      "events": {
+        "click": "makeCall"
+      }
     },
     {
       "type": "input",
@@ -224,7 +187,10 @@ module.exports = {
       "classList": [
         "btn"
       ],
-      "id": "hangup"
+      "id": "hangup",
+      "events": {
+        "click": "endCall"
+      }
     },
     {
       "type": "div",
@@ -8765,12 +8731,6 @@ function plural(ms, n, name) {
 "use strict";
 
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
@@ -9054,10 +9014,11 @@ class Application {
       if (conversation.members.has((processed_event || {}).from)) {
         member = conversation.members.get(processed_event.from);
       } else if (event.type === 'member:joined' || event.type === 'member:invited') {
-        const params = _objectSpread(_objectSpread({}, event.body), event.from && {
-          member_id: event.from
-        });
-
+        const params = { ...event.body,
+          ...(event.from && {
+            member_id: event.from
+          })
+        };
         member = new member_1.default(conversation, params);
       } else {
         try {
@@ -9185,9 +9146,9 @@ class Application {
       }
 
       const conversation = await this.getConversation(conversationId, Application.CONVERSATION_API_VERSION.v1);
-      await conversation.media.enable(_objectSpread(_objectSpread({}, mediaParams), {}, {
+      await conversation.media.enable({ ...mediaParams,
         reconnectRtcId: rtcId
-      }));
+      });
       const nxmCall = new nxmCall_1.default(this, conversation); // assigning the correct call status taking into account the sip status (outbound)
       // on inbound calls the reconnect will happen after the call is estabilished and both legs are answered
 
@@ -9506,12 +9467,6 @@ module.exports = Application;
 "use strict";
 
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
@@ -9700,14 +9655,17 @@ class Conversation {
         channel: {
           type: 'app'
         },
-        user: _objectSpread(_objectSpread(_objectSpread({}, !params && {
-          name: this.application.me.name,
-          id: this.application.me.id
-        }), params && params.user_name && {
-          name: params.user_name
-        }), params && params.user_id && {
-          id: params.user_id
-        })
+        user: { ...(!params && {
+            name: this.application.me.name,
+            id: this.application.me.id
+          }),
+          ...(params && params.user_name && {
+            name: params.user_name
+          }),
+          ...(params && params.user_id && {
+            id: params.user_id
+          })
+        }
       };
 
       if ((_b = (_a = this) === null || _a === void 0 ? void 0 : _a.me) === null || _b === void 0 ? void 0 : _b.id) {
@@ -9809,11 +9767,13 @@ class Conversation {
 
     const data = {
       state: 'invited',
-      user: _objectSpread(_objectSpread({}, params.id && {
-        id: params.id
-      }), params.user_name && {
-        name: params.user_name
-      }),
+      user: { ...(params.id && {
+          id: params.id
+        }),
+        ...(params.user_name && {
+          name: params.user_name
+        })
+      },
       media: params.media,
       channel: {
         from: {
@@ -10212,7 +10172,8 @@ class Conversation {
         type: 'message',
         cid: this.id,
         from: this.me.id,
-        body: _objectSpread({}, params)
+        body: { ...params
+        }
       };
       const {
         id,
@@ -10452,17 +10413,24 @@ class Conversation {
         image_url,
         custom_data
       } = event.body.user;
-      memberInfo = _objectSpread(_objectSpread({}, memberInfo), _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread({}, id && {
-        userId: id
-      }), name && {
-        userName: name
-      }), display_name && {
-        displayName: display_name
-      }), image_url && {
-        imageUrl: image_url
-      }), custom_data && {
-        customData: custom_data
-      }));
+      memberInfo = { ...memberInfo,
+        ...{ ...(id && {
+            userId: id
+          }),
+          ...(name && {
+            userName: name
+          }),
+          ...(display_name && {
+            displayName: display_name
+          }),
+          ...(image_url && {
+            imageUrl: image_url
+          }),
+          ...(custom_data && {
+            customData: custom_data
+          })
+        }
+      };
     } else if ((_d = (_c = event) === null || _c === void 0 ? void 0 : _c._embedded) === null || _d === void 0 ? void 0 : _d.from_user) {
       const {
         id,
@@ -10471,17 +10439,24 @@ class Conversation {
         image_url,
         custom_data
       } = event._embedded.from_user;
-      memberInfo = _objectSpread(_objectSpread({}, memberInfo), _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread({}, id && {
-        userId: id
-      }), name && {
-        userName: name
-      }), display_name && {
-        displayName: display_name
-      }), image_url && {
-        imageUrl: image_url
-      }), custom_data && {
-        customData: custom_data
-      }));
+      memberInfo = { ...memberInfo,
+        ...{ ...(id && {
+            userId: id
+          }),
+          ...(name && {
+            userName: name
+          }),
+          ...(display_name && {
+            displayName: display_name
+          }),
+          ...(image_url && {
+            imageUrl: image_url
+          }),
+          ...(custom_data && {
+            customData: custom_data
+          })
+        }
+      };
     }
 
     let constructed_event = this.conversationEventHandler.handleEvent(event); // Unless they are typing events, add the event to the conversation.events map
@@ -12665,12 +12640,6 @@ module.exports = ErrorsEmitter;
 "use strict";
 
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
@@ -12859,10 +12828,10 @@ class Media {
           log,
           rtcObjects
         };
-        onIceCandidateHandler(_objectSpread(_objectSpread({}, context), {}, {
+        onIceCandidateHandler({ ...context,
           resolve,
           reject
-        }));
+        });
         rtc_helper_1.default.attachConversationEventHandlers(context);
 
         this._attachEndingEventHandlers();
@@ -12896,9 +12865,9 @@ class Media {
     const {
       reconnectRtcId
     } = params;
-    return this._audioInitHandler(params, context => rtc_helper_1.default.attachPeerConnectionEventHandlers(_objectSpread(_objectSpread({}, context), {}, {
+    return this._audioInitHandler(params, context => rtc_helper_1.default.attachPeerConnectionEventHandlers({ ...context,
       reconnectRtcId
-    })));
+    }));
   }
 
   _findRtcObjectByType(type) {
@@ -13450,12 +13419,6 @@ module.exports = Media;
 
 "use strict";
 
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -14053,7 +14016,7 @@ class NXMCall {
       const params = {
         type: 'POST',
         path: 'knocking',
-        data: _objectSpread({
+        data: {
           channel: {
             type: 'app',
             from: {
@@ -14061,12 +14024,13 @@ class NXMCall {
             },
             to,
             id: legId || null
-          }
-        }, custom_data && Object.keys(custom_data).length && {
-          properties: {
-            custom_data
-          }
-        })
+          },
+          ...(custom_data && Object.keys(custom_data).length && {
+            properties: {
+              custom_data
+            }
+          })
+        }
       };
 
       try {
@@ -14186,12 +14150,6 @@ module.exports = NXMCall;
 "use strict";
 
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
@@ -14291,9 +14249,13 @@ class PublicIp {}
 
 exports["default"] = PublicIp;
 
-PublicIp.v4 = options => queryHttps('v4', _objectSpread(_objectSpread({}, defaults), options));
+PublicIp.v4 = options => queryHttps('v4', { ...defaults,
+  ...options
+});
 
-PublicIp.v6 = options => queryHttps('v6', _objectSpread(_objectSpread({}, defaults), options));
+PublicIp.v6 = options => queryHttps('v6', { ...defaults,
+  ...options
+});
 
 module.exports = PublicIp;
 
@@ -14307,12 +14269,6 @@ module.exports = PublicIp;
 
 "use strict";
 
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var __importStar = void 0 && (void 0).__importStar || function (mod) {
   if (mod && mod.__esModule) return mod;
@@ -14470,14 +14426,15 @@ class RtcHelper {
   }
 
   static createRTCPeerConnectionConfig(application) {
-    return _objectSpread({
+    return {
       iceTransportPolicy: 'all',
       bundlePolicy: 'balanced',
       rtcpMuxPolicy: 'require',
-      iceCandidatePoolSize: '0'
-    }, application.session.config && application.session.config.iceServers && {
-      iceServers: application.session.config.iceServers
-    });
+      iceCandidatePoolSize: '0',
+      ...(application.session.config && application.session.config.iceServers && {
+        iceServers: application.session.config.iceServers
+      })
+    };
   }
 
   static createPeerConnection(application) {
@@ -14573,10 +14530,10 @@ class RtcHelper {
       } = config;
 
       if (emit_events || remote_collection || emit_rtc_analytics) {
-        const params = _objectSpread(_objectSpread({}, context), {}, {
-          config: _objectSpread({}, config)
-        });
-
+        const params = { ...context,
+          config: { ...config
+          }
+        };
         return new rtcstats_analytics_1.default(params);
       }
     }
@@ -14834,12 +14791,6 @@ module.exports = RtcHelper;
 "use strict";
 
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var __importDefault = void 0 && (void 0).__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
@@ -14952,18 +14903,20 @@ class RTCStatsAnalytics {
 
     if (mos) {
       if (emit_rtc_analytics) {
-        application.emit("rtcstats:analytics", _objectSpread(_objectSpread({
+        application.emit("rtcstats:analytics", {
           type: "mos_report",
           mos,
           rtc_id,
           mos_report,
-          api_key: application.session.apiKey
-        }, this.application_id && {
-          application_id: this.application_id
-        }), conversation && {
-          conversation_id: conversation.id,
-          conversation_name: conversation.name
-        }));
+          api_key: application.session.apiKey,
+          ...(this.application_id && {
+            application_id: this.application_id
+          }),
+          ...(conversation && {
+            conversation_id: conversation.id,
+            conversation_name: conversation.name
+          })
+        });
       }
 
       if (emit_events) {
@@ -15002,15 +14955,17 @@ class RTCStatsAnalytics {
         utils_1.default.networkRequest({
           url: remote_collection_url,
           type: "POST",
-          data: _objectSpread(_objectSpread(_objectSpread({}, rtcStatsAdapterParser(report)), {}, {
+          data: { ...rtcStatsAdapterParser(report),
             legId: rtc_id,
-            apiKey: application.session.apiKey
-          }, this.application_id && {
-            applicationId: this.application_id
-          }), conv && {
-            conversationId: conv.id,
-            conversationName: conv.name
-          })
+            apiKey: application.session.apiKey,
+            ...(this.application_id && {
+              applicationId: this.application_id
+            }),
+            ...(conv && {
+              conversationId: conv.id,
+              conversationName: conv.name
+            })
+          }
         }).catch(() => {});
       }).catch(() => {});
 
@@ -15045,18 +15000,20 @@ class RTCStatsAnalytics {
         const conv = (_a = conversation !== null && conversation !== void 0 ? conversation : this.conversation, _a !== null && _a !== void 0 ? _a : null);
 
         if (emit_rtc_analytics) {
-          application.emit("rtcstats:analytics", _objectSpread(_objectSpread({
+          application.emit("rtcstats:analytics", {
             type: "mos",
             mos,
             report: stats,
             rtc_id,
-            api_key: application.session.apiKey
-          }, this.application_id && {
-            application_id: this.application_id
-          }), conv && {
-            conversation_id: conv.id,
-            conversation_name: conv.name
-          }));
+            api_key: application.session.apiKey,
+            ...(this.application_id && {
+              application_id: this.application_id
+            }),
+            ...(conv && {
+              conversation_id: conv.id,
+              conversation_name: conv.name
+            })
+          });
         }
 
         if (emit_events) {
@@ -15075,9 +15032,9 @@ class RTCStatsAnalytics {
 
       if (pc.connectionState === "closed" || pc.signalingState === 'closed') {
         this.removeIntervals();
-        this.emitLastReport(_objectSpread(_objectSpread({}, context), {}, {
+        this.emitLastReport({ ...context,
           conversation: (_a = conversation !== null && conversation !== void 0 ? conversation : this.conversation, _a !== null && _a !== void 0 ? _a : null)
-        }));
+        });
       }
     }, emit_interval);
     this.intervals.push(emit_stats_interval_id);
@@ -15695,12 +15652,6 @@ module.exports = MembersPage;
 "use strict";
 
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
@@ -15768,14 +15719,14 @@ class Page {
 
 
   _getConfig(cursor) {
-    const config = _objectSpread({
+    const config = {
       page_size: this.page_size,
       order: this.order,
-      cursor
-    }, this.event_type && {
-      event_type: this.event_type
-    });
-
+      cursor,
+      ...(this.event_type && {
+        event_type: this.event_type
+      })
+    };
     return config;
   }
   /**
@@ -26934,7 +26885,7 @@ var __webpack_exports__ = {};
 
 var $app_style$ = __webpack_require__(/*! !../../node_modules/@hap-toolkit/dsl-xvm/lib/loaders/style-loader.js?index=0&type=style!../../node_modules/@hap-toolkit/dsl-xvm/lib/loaders/fragment-loader.js?index=0&type=style!./hello.ux?uxType=page */ "./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/style-loader.js?index=0&type=style!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/fragment-loader.js?index=0&type=style!./src/Hello/hello.ux?uxType=page")
 
-var $app_script$ = __webpack_require__(/*! !../../node_modules/@hap-toolkit/dsl-xvm/lib/loaders/script-loader.js!../../node_modules/@hap-toolkit/dsl-xvm/lib/loaders/module-loader.js!../../node_modules/babel-loader/lib/index.js?cwd=/Users/zacharypowell/.quickapp-ide/workspace/com.vonage.quickapp.test&cacheDirectory&plugins[]=/Users/zacharypowell/.quickapp-ide/workspace/com.vonage.quickapp.test/node_modules/@hap-toolkit/dsl-xvm/lib/loaders/babel-plugin-jsx.js&comments=false&configFile=/Users/zacharypowell/.quickapp-ide/workspace/com.vonage.quickapp.test/node_modules/@hap-toolkit/packager/babel.config.js!../../node_modules/@hap-toolkit/dsl-xvm/lib/loaders/access-loader.js!../../node_modules/@hap-toolkit/dsl-xvm/lib/loaders/fragment-loader.js?index=0&type=script!./hello.ux?uxType=page */ "./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/script-loader.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/module-loader.js!./node_modules/babel-loader/lib/index.js?cwd=/Users/zacharypowell/.quickapp-ide/workspace/com.vonage.quickapp.test&cacheDirectory&plugins[]=/Users/zacharypowell/.quickapp-ide/workspace/com.vonage.quickapp.test/node_modules/@hap-toolkit/dsl-xvm/lib/loaders/babel-plugin-jsx.js&comments=false&configFile=/Users/zacharypowell/.quickapp-ide/workspace/com.vonage.quickapp.test/node_modules/@hap-toolkit/packager/babel.config.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/access-loader.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/fragment-loader.js?index=0&type=script!./src/Hello/hello.ux?uxType=page")
+var $app_script$ = __webpack_require__(/*! !../../node_modules/@hap-toolkit/dsl-xvm/lib/loaders/script-loader.js!../../node_modules/@hap-toolkit/dsl-xvm/lib/loaders/module-loader.js!../../node_modules/babel-loader/lib/index.js?cwd=/Users/zacharypowell/Documents/Code/sample/quickapp-helloworld&cacheDirectory&plugins[]=/Users/zacharypowell/Documents/Code/sample/quickapp-helloworld/node_modules/@hap-toolkit/dsl-xvm/lib/loaders/babel-plugin-jsx.js&comments=false&configFile=/Users/zacharypowell/Documents/Code/sample/quickapp-helloworld/babel.config.js!../../node_modules/@hap-toolkit/dsl-xvm/lib/loaders/access-loader.js!../../node_modules/@hap-toolkit/dsl-xvm/lib/loaders/fragment-loader.js?index=0&type=script!./hello.ux?uxType=page */ "./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/script-loader.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/module-loader.js!./node_modules/babel-loader/lib/index.js?cwd=/Users/zacharypowell/Documents/Code/sample/quickapp-helloworld&cacheDirectory&plugins[]=/Users/zacharypowell/Documents/Code/sample/quickapp-helloworld/node_modules/@hap-toolkit/dsl-xvm/lib/loaders/babel-plugin-jsx.js&comments=false&configFile=/Users/zacharypowell/Documents/Code/sample/quickapp-helloworld/babel.config.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/access-loader.js!./node_modules/@hap-toolkit/dsl-xvm/lib/loaders/fragment-loader.js?index=0&type=script!./src/Hello/hello.ux?uxType=page")
 
 $app_define$('@app-component/hello', [], function($app_require$, $app_exports$, $app_module$) {
      $app_script$($app_module$, $app_exports$, $app_require$)
