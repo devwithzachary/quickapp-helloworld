@@ -30,8 +30,8 @@
   },
   "packageInfo": {
     "originType": "cmd",
-    "toolkit": "1.9.10",
-    "timeStamp": "2022-09-15T09:33:55.102Z",
+    "toolkit": "1.9.11",
+    "timeStamp": "2022-11-21T15:27:51.453Z",
     "node": "v16.14.2",
     "platform": "darwin",
     "arch": "x64"

@@ -18,11 +18,9 @@ module.exports = {
   onCreate() {
     console.info('Application onCreate');
   },
-
   onDestroy() {
     console.info('Application onDestroy');
   },
-
   dataApp: {
     localeData: {}
   }
@@ -88,7 +86,7 @@ $app_define$('@app-application/app', [], function ($app_require$, $app_exports$,
   $app_module$.exports.style = { list: [ $app_style$ ] }
   
 })
-$app_bootstrap$('@app-application/app', { packagerVersion: "1.9.10" })
+$app_bootstrap$('@app-application/app', { packagerVersion: "1.9.11" })
 
 })();
 
