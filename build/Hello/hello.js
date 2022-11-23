@@ -15,7 +15,7 @@ module.exports = function __scriptModule__ (module, exports, $app_require$){"use
 var _system = _interopRequireDefault($app_require$("@app-module/system.prompt"));
 var _clientSdk = _interopRequireDefault(__webpack_require__(/*! @vonage/client-sdk */ "./node_modules/@vonage/client-sdk/dist/Client.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-let vonageJWT = '';
+let vonageJWT = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NjkxMTA2MzEsImp0aSI6IjFhM2IyYTkwLTZhNGItMTFlZC05ZjllLWEzZjE3YmQ2MmIxNSIsImFwcGxpY2F0aW9uX2lkIjoiODgyNDk4OWEtZTg3Ny00NTEzLWI3OTQtYTgzMjRmYTdjNDViIiwic3ViIjoiQWxpY2UiLCJleHAiOjE2NjkxMTA2NTI5NTMsImFjbCI6eyJwYXRocyI6eyIvKi91c2Vycy8qKiI6e30sIi8qL2NvbnZlcnNhdGlvbnMvKioiOnt9LCIvKi9zZXNzaW9ucy8qKiI6e30sIi8qL2RldmljZXMvKioiOnt9LCIvKi9pbWFnZS8qKiI6e30sIi8qL21lZGlhLyoqIjp7fSwiLyovYXBwbGljYXRpb25zLyoqIjp7fSwiLyovcHVzaC8qKiI6e30sIi8qL2tub2NraW5nLyoqIjp7fSwiLyovbGVncy8qKiI6e319fX0.neSfSAjW_cyXmp50tftoX-uMkZOxpRNtyO2VFjiaHaL-x3A4zrIV_omHIasGo5ZGuqyP8PCXJ5ro-agavPo2lkJwfF_ke4UhsutVuNISM0U__sULGXNyFO_4aY7lzYcphvYdUu1DoFk4Tv_TL2dyfqRLltg-pHwTGxc4u9zX_d8DkPmieHiSK2RFNdv7zUgdGzb5N_CZ9dTQ_ZUjQ4C7l2dJHNYMbfW4bn0t1z7T_EjfQb9tL0L0YRfVojOZoFTwvTRBmnIBTawEs3t5kRWvO_JUGt5d-BvMqw8aB7IqHWQEQlUyNEMM25l_kDf6l6E8-laZv4zRP6lA6jRg45_vSQ';
 let client = new _clientSdk.default();
 let config = new _clientSdk.default(_clientSdk.default.EU);
 let currentCall;
@@ -66,7 +66,6 @@ module.exports = {
     currentCall.hangUp();
   }
 };
-
 const moduleOwn = exports.default || module.exports;
 const accessors = ['public', 'protected', 'private'];
 if (moduleOwn.data && accessors.some(function (acc) {
